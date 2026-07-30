@@ -1,0 +1,50 @@
+{
+  "domain_name": "FinTech & LegalTech Operations",
+  "tables": {
+    "clients": {
+      "description": "Реестр клиентов — юридических и физических лиц, с которыми заключены договоры лизинга.",
+      "columns": {
+        "client_id": "INTEGER — первичный ключ, уникальный идентификатор клиента",
+        "client_name": "VARCHAR(255) — полное наименование клиента",
+        "inn": "VARCHAR(12) — ИНН клиента (идентификатор налогоплательщика)",
+        "segment": "VARCHAR(50) — сегмент клиента (VIP, SMB, Micro)",
+        "registration_date": "DATE — дата регистрации клиента в системе",
+        "is_active": "BOOLEAN — признак активности клиента"
+      }
+    },
+    "leasing_contracts": {
+      "description": "Договоры лизинга, заключённые с клиентами. Связь с клиентом по client_id.",
+      "columns": {
+        "contract_id": "INTEGER — первичный ключ договора",
+        "client_id": "INTEGER — внешний ключ на clients.client_id",
+        "contract_number": "VARCHAR(64) — уникальный номер договора",
+        "start_date": "DATE — дата начала действия договора",
+        "end_date": "DATE — дата окончания действия договора",
+        "contract_amount": "NUMERIC(18,2) — сумма договора в рублях",
+        "status": "VARCHAR(32) — статус договора (ACTIVE, CLOSED, TERMINATED)"
+      }
+    },
+    "payments_schedule": {
+      "description": "График платежей по договорам лизинга. Связь с договором по contract_id.",
+      "columns": {
+        "payment_id": "INTEGER — первичный ключ платежа",
+        "contract_id": "INTEGER — внешний ключ на leasing_contracts.contract_id",
+        "due_date": "DATE — плановая дата оплаты",
+        "paid_date": "DATE — фактическая дата оплаты (NULL если не оплачен)",
+        "amount_due": "NUMERIC(18,2) — сумма к оплате по графику",
+        "amount_paid": "NUMERIC(18,2) — фактически оплаченная сумма",
+        "status": "VARCHAR(32) — статус платежа (PAID, OVERDUE, PENDING)"
+      }
+    }
+  },
+  "strict_rules": [
+    "Все SQL-операторы (SELECT, FROM, WHERE, JOIN, GROUP BY, ORDER BY, OVER, PARTITION BY) писать СТРОГО в верхнем регистре.",
+    "Всегда использовать явные JOIN с указанием типа (INNER JOIN, LEFT JOIN, RIGHT JOIN). Запрещены неявные соединения через WHERE.",
+    "Для задач топ-ранжирования (топ-N, первые N по группе) обязательно использовать оконные функции ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...).",
+    "Запрещено использовать SELECT *. Всегда перечислять конкретные колонки в SELECT.",
+    "Все идентификаторы таблиц и колонок брать строго из предоставленной схемы. Запрещено выдумывать таблицы и поля.",
+    "Фильтры по датам оформлять через явное приведение типа DATE 'YYYY-MM-DD'.",
+    "Для агрегатов использовать только стандартные функции: SUM, AVG, COUNT, MIN, MAX.",
+    "Выходной SQL должен быть исполняемым на PostgreSQL (версия 14+)."
+  ]
+}
